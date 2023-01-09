@@ -1,0 +1,4 @@
+Tecnologias
+-Node
+-Cheerio--
+-esLing
