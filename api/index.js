@@ -13,7 +13,7 @@
 /* eslint-disable semi */
 import leaderboard from '../db/leaderboard.json';
 import { Hono } from 'hono';
-
+import { serveStatic } from 'hono/serve-static.module';
 const app = new Hono();
 
 app.get('/', (ctx) => {
@@ -25,6 +25,7 @@ app.get('/', (ctx) => {
 app.get('/leaderboard', (ctx) => {
     return ctx.json(leaderboard);
 });
+app.get('/static/*', serveStatic({ root: './' }));
 
 export default app;
 

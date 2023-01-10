@@ -9,7 +9,11 @@ import path from 'node:path';
 const URLS = {
     leaderboard: 'https://kingsleague.pro/estadisticas/clasificacion/',
 };
-
+const DB_PATH = path.join(process.cwd(), './db');
+let TEAMS = [];
+await fs.readFile(`${DB_PATH}/teams.json`, 'utf-8', function (_, data) {
+    TEAMS = JSON.parse(data);
+});
 async function scrape(url) {
     const res = await fetch(url);
     const html = await res.text();
@@ -19,11 +23,6 @@ async function scrape(url) {
 async function getLeaderBoard() {
     const $ = await scrape(URLS.leaderboard);
     const $rows = $('table tbody tr');
-    const cleanText = (text) =>
-        text
-            .replace(/\t|\n|\s:/g, '')
-            .replace(/.*:/g, ' ')
-            .trim();
 
     const LEADERBOARD_SELECTOR = {
         team: { selector: '.fs-table-text_3', typeOf: 'string' },
@@ -34,9 +33,16 @@ async function getLeaderBoard() {
         cardsYellow: { selector: '.fs-table-text_8', typeOf: 'number' },
         cardsRed: { selector: '.fs-table-text_9', typeOf: 'number' },
     };
+    const getTeamFrom = ({ name }) => TEAMS.find((team) => team.name === name);
+
+    const cleanText = (text) =>
+        text
+            .replace(/\t|\n|\s:/g, '')
+            .replace(/.*:/g, ' ')
+            .trim();
 
     const leaderBoard = [];
-    $rows.each((indes, el) => {
+    $rows.each((index, el) => {
         const leaderBoardSelectorEntries = Object.entries(
             LEADERBOARD_SELECTOR
         ).map(([key, { selector, typeOf }]) => {
@@ -46,30 +52,20 @@ async function getLeaderBoard() {
                 typeOf === 'number' ? Number(valueCleanText) : valueCleanText;
             return [key, value];
         });
-        leaderBoard.push(Object.fromEntries(leaderBoardSelectorEntries));
+        const { team: teamName, ...leaderboardForTeam } = Object.fromEntries(
+            leaderBoardSelectorEntries
+        );
+        const team = getTeamFrom({ name: teamName });
+        leaderBoard.push({ ...leaderboardForTeam, team });
     });
     return leaderBoard;
 }
 const leaderboardresult = await getLeaderBoard();
 // Desde que ubicacion se esta ejecutando el script process.cwd()
-const filePath = path.join(process.cwd(), './db/leaderboard.json');
 
 await fs.writeFile(
-    filePath,
+    `${DB_PATH}/leaderboard.json`,
     JSON.stringify(leaderboardresult, null, 2),
     'utf-8',
-    (result) => {
-        console.log(result);
-    }
+    (result) => {}
 );
-// const leaderboard = [
-//     {
-//         team: 'Team1',
-//         wins: 0,
-//         loses: 0,
-//         goalsScored: 0,
-//         goalsConceded: 0,
-//         cardsYellow: 0,
-//         cardsRed: 0,
-//     },
-// ];
