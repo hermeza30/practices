@@ -12,6 +12,8 @@
 /* eslint-disable indent */
 /* eslint-disable semi */
 import leaderboard from '../db/leaderboard.json';
+import teams from '../db/teams.json';
+import presidents from '../db/presidents.json';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/serve-static.module';
 const app = new Hono();
@@ -24,6 +26,18 @@ app.get('/', (ctx) => {
 });
 app.get('/leaderboard', (ctx) => {
     return ctx.json(leaderboard);
+});
+app.get('/presidents', (ctx) => {
+    return ctx.json(presidents);
+});
+app.get('/presidents/:id', (ctx) => {
+    const foundPresident = presidents.find((p) => p.id === ctx.req.param('id'));
+    return ctx.json(
+        foundPresident || { message: 'President not found', error: 404 }
+    );
+});
+app.get('/teans', (ctx) => {
+    return ctx.json(teams);
 });
 app.get('/static/*', serveStatic({ root: './' }));
 
