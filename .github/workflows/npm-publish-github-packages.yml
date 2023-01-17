@@ -26,6 +26,7 @@ jobs:
       - run:
           npm install
           node scraping/leaderboard.js
+          git config user.name hermeza30
           git add -A
           git commit -m "[bot] update practice"
           git push origin main
