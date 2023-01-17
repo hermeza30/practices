@@ -9,9 +9,9 @@ on:
   workflow_dispatch: 
   repository_dispatch:
     types:
-      - webhook
+     - webhook
   schedule:
-    - cron: "0 */1 * * 1"
+     - cron: "0 */1 * * 1"
 
 jobs:
   build:
@@ -24,6 +24,7 @@ jobs:
         with:
           node-version: 16.13
       - run:
+          npm install
           node scraping/leaderboard.js
           git add -A
           git commit -m "[bot] update practice"
