@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 16.13
       - run:
-          sudo npm install
+          npm i
           node scraping/leaderboard.js
           git config user.name hermeza30
           git add -A
