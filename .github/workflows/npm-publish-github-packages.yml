@@ -17,11 +17,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Setup SSH
-        uses: MrSquaare/ssh-setup-action@v2
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
         with:
-          host: github.com
-          private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.sshtony }} 
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
